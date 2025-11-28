@@ -15,7 +15,19 @@ java {
 }
 
 repositories {
-	mavenCentral()
+	mavenCentral()// Add GitHub Packages repository
+
+    maven {
+        name = "GitHubPackages"
+        // This URL points to the owner/repository where you deployed the package
+        url = uri("https://maven.pkg.github.com/cianmacg/TextForge")
+        credentials {
+            // IMPORTANT: Credentials are required to download from GitHub Packages
+            // Use environment variables or local properties for security.
+            username = project.findProperty("gthbUsername") ?: ''
+            password = project.findProperty("gthbPAT") ?: ''
+        }
+    }
 }
 
 dependencies {
@@ -25,6 +37,8 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-actuator-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    implementation 'com.github.cianmacg:textforge:1.0.1'
 }
 
 tasks.named('test') {
