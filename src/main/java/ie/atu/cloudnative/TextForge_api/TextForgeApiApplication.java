@@ -10,5 +10,4 @@ public class TextForgeApiApplication {
 	public static void main(String[] args) {
         SpringApplication.run(TextForgeApiApplication.class, args);
 	}
-
 }
