@@ -10,7 +10,7 @@ description = 'Project for TextFore API'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(25)
+		languageVersion = JavaLanguageVersion.of(24)
 	}
 }
 
@@ -33,6 +33,8 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+	implementation 'org.springframework.boot:spring-boot-starter-validation' // For @NotNull, etc tags
+
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-actuator-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
@@ -41,6 +43,16 @@ dependencies {
     implementation 'com.github.cianmacg:textforge:1.0.1'
 }
 
+tasks.withType(JavaCompile).configureEach {
+	options.compilerArgs.add('--enable-preview')
+}
+
+// Target the Spring Boot 'bootRun' task by name and type
+tasks.named('bootRun', org.springframework.boot.gradle.tasks.run.BootRun) {
+	jvmArgs = ['--enable-preview']
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
+	jvmArgs.add('--enable-preview')
 }
