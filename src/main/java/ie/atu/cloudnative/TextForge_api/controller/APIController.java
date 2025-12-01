@@ -1,12 +1,9 @@
 package ie.atu.cloudnative.TextForge_api.controller;
 
-import ie.atu.cloudnative.TextForge_api.Services.StemmingService;
-import ie.atu.cloudnative.TextForge_api.requests.DecodeRequest;
-import ie.atu.cloudnative.TextForge_api.requests.EncodeRequest;
-import ie.atu.cloudnative.TextForge_api.requests.StemRequest;
-import ie.atu.cloudnative.TextForge_api.requests.TokensRequest;
-import ie.atu.cloudnative.TextForge_api.Services.TokenisationService;
-import main.java.ie.atu.forge.Stemmers.Porter;
+import ie.atu.cloudnative.TextForge_api.services.*;
+import ie.atu.cloudnative.TextForge_api.requests.*;
+import main.java.ie.atu.forge.Similarity.Alignment.Extension;
+import main.java.ie.atu.forge.Vectorisers.BagOfWords;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,10 +12,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class APIController {
     private final TokenisationService tokenisationService;
     private final StemmingService stemmingService;
+    private final VectorisationService vectorisationService;
+    private final AlignmentService alignmentService;
+    private final SimilarityService similarityService;
 
-    public APIController(TokenisationService tokenisationService, StemmingService stemmingService) {
+    public APIController(TokenisationService tokenisationService,
+                         StemmingService stemmingService,
+                         VectorisationService vectorisationService,
+                         AlignmentService alignmentService,
+                         SimilarityService similarityService) {
+
         this.tokenisationService = tokenisationService;
         this.stemmingService = stemmingService;
+        this.vectorisationService = vectorisationService;
+        this.alignmentService = alignmentService;
+        this.similarityService = similarityService;
     }
 
     /*
@@ -26,7 +34,7 @@ public class APIController {
     As a result, it is necessary to create the 'TokensRequest' object.
      */
     @GetMapping("/tokens")
-    public String[] getTokens(@RequestBody TokensRequest request){
+    public String[] tokenise(@RequestBody TokenRequest request){
         System.out.println("Request: " + request);
 
         String text = request.text();
@@ -48,7 +56,27 @@ public class APIController {
     }
 
     @GetMapping("/stem")
-    public String[] getStems(@RequestBody StemRequest request){
+    public String[] stem(@RequestBody StemRequest request){
         return stemmingService.stem(request.text(), request.method());
+    }
+
+    @GetMapping("/vector")
+    public BagOfWords vectorise(@RequestBody VectorRequest request){
+        return vectorisationService.vectorise(request.words(), request.sentence());
+    }
+
+    @GetMapping("/similarity")
+    public double similarity() {
+
+    }
+
+    @GetMapping("/align")
+    public String[] align() {
+
+    }
+
+    @GetMapping("/seed")
+    public Extension[] seedAndExtend() {
+
     }
 }

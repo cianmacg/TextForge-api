@@ -1,4 +1,4 @@
-package ie.atu.cloudnative.TextForge_api.Services;
+package ie.atu.cloudnative.TextForge_api.services;
 
 import main.java.ie.atu.forge.Stemmers.Lancaster;
 import main.java.ie.atu.forge.Stemmers.Lovins;
