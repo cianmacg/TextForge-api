@@ -18,8 +18,6 @@ public class SimilarityService {
     }
 
     public double similarity(int[] v1, int[] v2, String method, Double p) {
-        System.out.println("Doing stuff with: \n" + v1[3] + "\n" + v2[3]);
-
         if(v1 == null) v1 = new int[]{};
         if(v2 == null) v2 = new int[]{};
 

@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 @RestController
 public class APIController {
@@ -35,7 +33,7 @@ public class APIController {
     }
 
     /*
-    Spring won't let overloading methods with the same path mapping.
+    Spring won't allow overloading methods with the same path mapping.
     As a result, it is necessary to create the 'TokensRequest' object.
      */
     @GetMapping("/tokens")
@@ -84,9 +82,7 @@ public class APIController {
 
 
         if(nonSetMethods.contains(type)) {
-            Double d = similarityService.similarity(request.v1(), request.v2(), type, request.p());
-            System.out.println("\nResult: "+ d);
-            return d;
+            return similarityService.similarity(request.v1(), request.v2(), type, request.p());
         }
 
         if(setMethods.contains(type)) {
