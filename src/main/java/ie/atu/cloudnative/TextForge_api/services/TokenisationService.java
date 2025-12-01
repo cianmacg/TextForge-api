@@ -6,43 +6,23 @@ import main.java.ie.atu.forge.Tokenisers.Shingle;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 @Service
 public class TokenisationService {
     private final BPE tokeniser;
 
-    private final ArrayList<String> ngramNames;
-    private final ArrayList<String> shingleNames;
-    private final ArrayList<String> bpeNames;
-
     public TokenisationService() throws IOException {
         this.tokeniser = new BPE();
         String pathToTokens = "src/main/resources/bpe_vocab_hex.json";
         tokeniser.loadVocabFromJsonHex(pathToTokens);
-
-        this.ngramNames  = new ArrayList<>(Arrays.asList("default", "ngram", "ngrams"));
-        this.shingleNames = new ArrayList<>(Arrays.asList("shingle", "shingles"));
-        this.bpeNames = new ArrayList<>(Arrays.asList("bpe", "byte-pair encoding", "byte pair encoding"));
     }
 
-    public String[] tokenise(String text, String method, int window) {
-        String type = method.toLowerCase();
+    public String[] ngrams(String text, int window) {
+        return Ngram.tokenise(text, window);
+    }
 
-        if(ngramNames.contains(type)) {
-            return Ngram.tokenise(text, window);
-        }
-        else if(shingleNames.contains(type)) {
-            return Shingle.tokenise(text, window);
-        }
-        else if(bpeNames.contains(type)) {
-            return Arrays.stream(tokeniser.encode(text))
-                    .mapToObj(String::valueOf)
-                    .toArray(String[]::new);
-        }
-
-        return null;
+    public String[] shingles(String text, int window) {
+        return Shingle.tokenise(text, window);
     }
 
     public int[] encode(String text) {
