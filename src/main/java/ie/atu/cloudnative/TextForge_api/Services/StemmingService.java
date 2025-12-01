@@ -7,17 +7,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class StemmingService {
-    private Porter porter;
-    private Lancaster lancaster;
-    private Lovins lovins;
+    public String[] stem(String text, String method) {
+        String[] words = text.split(" ");
 
-    public StemmingService() {
-        this.porter = new Porter();
-        this.lancaster = new Lancaster();
-        this.lovins = new Lovins();
+        return switch (method) {
+            case "porter" -> Porter.stem(words);
+            case "lancaster" -> Lancaster.stem(words);
+            case "lovins" -> Lovins.stem(words);
+            default -> null;
+        };
     }
-
-//    public String[] stem(String text, String method) {
-//
-//    }
 }
