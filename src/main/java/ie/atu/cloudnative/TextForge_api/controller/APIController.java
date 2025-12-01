@@ -8,6 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 @RestController
 public class APIController {
     private final TokenisationService tokenisationService;
@@ -66,17 +71,43 @@ public class APIController {
     }
 
     @GetMapping("/similarity")
-    public double similarity() {
+    public Double similarity(@RequestBody SimilarityRequest request) {
+        String type = request.method().toLowerCase();
 
+        ArrayList<String> nonSetMethods = new ArrayList<>(Arrays.asList(
+                "canberra", "chebyshev", "cosine", "euclidean", "minkowski", "manhattan"
+        ));
+
+        ArrayList<String> setMethods = new ArrayList<>(Arrays.asList(
+                "jaccard", "sorensendice", "tversky", "minhash"
+        ));
+
+
+        if(nonSetMethods.contains(type)) {
+            Double d = similarityService.similarity(request.v1(), request.v2(), type, request.p());
+            System.out.println("\nResult: "+ d);
+            return d;
+        }
+
+        if(setMethods.contains(type)) {
+            return similarityService.setSimilarity(request.s1(), request.s2(), type, request.a(), request.b());
+        }
+
+        return null;
     }
 
-    @GetMapping("/align")
-    public String[] align() {
-
+    @GetMapping("/distance")
+    public Double distance(@RequestBody AlignmentRequest request) {
+        return alignmentService.distance(request.s1(), request.s2(), request.method().toLowerCase());
     }
 
-    @GetMapping("/seed")
-    public Extension[] seedAndExtend() {
+    @GetMapping("/alignment")
+    public String[] align(@RequestBody AlignmentRequest request) {
+        return alignmentService.alignment(request.s1(), request.s2(), request.method().toLowerCase());
+    }
 
+    @GetMapping("/seedAndExtend")
+    public Extension[] seedAndExtend(@RequestBody SeedAndExtendRequest request) {
+        return alignmentService.seedAndExtend(request.s1(), request.s2(), request.kMerLength());
     }
 }

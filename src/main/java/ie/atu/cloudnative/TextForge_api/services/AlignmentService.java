@@ -8,9 +8,9 @@ public class AlignmentService {
     private final SmithWaterman smithWaterman;
     private final NeedlemanWunsch needlemanWunsch;
 
-    public AlignmentService(SmithWaterman smithWaterman, NeedlemanWunsch needlemanWunsch) {
-        this.smithWaterman = smithWaterman;
-        this.needlemanWunsch = needlemanWunsch;
+    public AlignmentService() {
+        this.smithWaterman = new SmithWaterman();
+        this.needlemanWunsch = new NeedlemanWunsch();
     }
 
     public Double distance(String s1, String s2, String method) {
@@ -24,7 +24,7 @@ public class AlignmentService {
         };
     }
 
-    public String[] alignment(String s1, String s2, String method, int kMerLength) {
+    public String[] alignment(String s1, String s2, String method) {
         return switch(method) {
             case "smithwaterman" -> smithWaterman.align(s1, s2);
             case "needlemanwunsch" -> needlemanWunsch.align(s1, s2);

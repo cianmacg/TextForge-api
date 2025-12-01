@@ -1,6 +1,5 @@
 package ie.atu.cloudnative.TextForge_api;
 
-import main.java.ie.atu.forge.Vectorisers.BagOfWords;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
