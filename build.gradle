@@ -40,6 +40,9 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mockito:mockito-junit-jupiter'
+
     implementation 'com.github.cianmacg:textforge:1.0.1'
 }
 
@@ -52,7 +55,7 @@ tasks.named('bootRun', org.springframework.boot.gradle.tasks.run.BootRun) {
 	jvmArgs = ['--enable-preview']
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
-	jvmArgs.add('--enable-preview')
+tasks.named('test', Test) {
+    useJUnitPlatform()
+    jvmArgs(['--enable-preview'])
 }

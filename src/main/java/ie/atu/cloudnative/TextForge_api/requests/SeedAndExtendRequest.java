@@ -8,5 +8,5 @@ public record SeedAndExtendRequest(
 
         @NotNull(message = "String 's2' is a required field.")
         String s2,
-        int kMerLength
+        Integer kMerLength
 ) {}

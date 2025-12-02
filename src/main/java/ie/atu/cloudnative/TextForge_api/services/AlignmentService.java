@@ -14,11 +14,11 @@ public class AlignmentService {
     }
 
     public String[] smithWaterman(String s1, String s2) {
-        return smithWaterman(s1,s2);
+        return smithWaterman.align(s1,s2);
     }
 
     public String[] needlemanWunsch(String s1, String s2) {
-        return needlemanWunsch(s1,s2);
+        return needlemanWunsch.align(s1,s2);
     }
 
     public Extension[] seedAndExtend(String s1, String s2, int kMerLength) {

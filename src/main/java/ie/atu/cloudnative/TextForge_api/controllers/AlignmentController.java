@@ -31,6 +31,8 @@ public class AlignmentController {
 
     @GetMapping("/seedandextend")
     public Extension[] seedAndExtend(@Valid @RequestBody SeedAndExtendRequest request) {
-        return alignmentService.seedAndExtend(request.s1(), request.s2(), request.kMerLength());
+        int kMerLength = request.kMerLength() != null ? request.kMerLength() : 3;
+
+        return alignmentService.seedAndExtend(request.s1(), request.s2(), kMerLength);
     }
 }
