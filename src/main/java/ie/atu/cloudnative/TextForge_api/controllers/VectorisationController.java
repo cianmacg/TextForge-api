@@ -2,6 +2,7 @@ package ie.atu.cloudnative.TextForge_api.controllers;
 
 import ie.atu.cloudnative.TextForge_api.requests.VectorRequest;
 import ie.atu.cloudnative.TextForge_api.services.VectorisationService;
+import jakarta.validation.Valid;
 import main.java.ie.atu.forge.Vectorisers.BagOfWords;
 import main.java.ie.atu.forge.Vectorisers.TFIDF;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,12 +20,12 @@ public class VectorisationController {
     }
 
     @GetMapping("bagofwords")
-    public BagOfWords bow(@RequestBody VectorRequest request) {
+    public BagOfWords bow(@Valid @RequestBody VectorRequest request) {
         return  vectorisationService.bow(request.documents());
     }
 
     @GetMapping("tfidf")
-    public TFIDF tfidf(@RequestBody VectorRequest request) {
+    public TFIDF tfidf(@Valid @RequestBody VectorRequest request) {
         return vectorisationService.tfidf(request.documents());
     }
 }

@@ -2,6 +2,7 @@ package ie.atu.cloudnative.TextForge_api.controllers;
 
 import ie.atu.cloudnative.TextForge_api.requests.StemRequest;
 import ie.atu.cloudnative.TextForge_api.services.StemmingService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,17 +18,17 @@ public class StemmingController {
     }
 
     @GetMapping("/porter")
-    public String[] porter(@RequestBody StemRequest request) {
+    public String[] porter(@Valid @RequestBody StemRequest request) {
         return stemmingService.porter(request.text());
     }
 
     @GetMapping("/lancaster")
-    public String[] lancaster(@RequestBody StemRequest request) {
+    public String[] lancaster(@Valid @RequestBody StemRequest request) {
         return stemmingService.lancaster(request.text());
     }
 
     @GetMapping("/lovins")
-    public String[] lovins(@RequestBody StemRequest request) {
+    public String[] lovins(@Valid @RequestBody StemRequest request) {
         return stemmingService.lovins(request.text());
     }
 }
