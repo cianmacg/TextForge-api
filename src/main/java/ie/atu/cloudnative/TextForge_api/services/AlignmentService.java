@@ -8,9 +8,9 @@ public class AlignmentService {
     private final SmithWaterman smithWaterman;
     private final NeedlemanWunsch needlemanWunsch;
 
-    public AlignmentService() {
-        this.smithWaterman = new SmithWaterman();
-        this.needlemanWunsch = new NeedlemanWunsch();
+    public AlignmentService(SmithWaterman sw, NeedlemanWunsch nw) {
+        this.smithWaterman = sw;
+        this.needlemanWunsch = nw;
     }
 
     public String[] smithWaterman(String s1, String s2) {

@@ -11,10 +11,8 @@ import java.io.IOException;
 public class TokenisationService {
     private final BPE tokeniser;
 
-    public TokenisationService() throws IOException {
-        this.tokeniser = new BPE();
-        String pathToTokens = "src/main/resources/bpe_vocab_hex.json";
-        tokeniser.loadVocabFromJsonHex(pathToTokens);
+    public TokenisationService(BPE bpe) throws IOException {
+        this.tokeniser = bpe;
     }
 
     public String[] ngrams(String text, int window) {

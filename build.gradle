@@ -43,7 +43,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.mockito:mockito-junit-jupiter'
 
-    implementation 'com.github.cianmacg:textforge:1.0.1'
+    implementation 'com.github.cianmacg:textforge:1.0.1-SNAPSHOT'
 }
 
 tasks.withType(JavaCompile).configureEach {

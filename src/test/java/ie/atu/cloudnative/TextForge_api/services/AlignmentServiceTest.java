@@ -1,123 +1,82 @@
 package ie.atu.cloudnative.TextForge_api.services;
 
 import main.java.ie.atu.forge.Similarity.Alignment.Extension;
-import org.junit.jupiter.api.BeforeEach;
+import main.java.ie.atu.forge.Similarity.Alignment.NeedlemanWunsch;
+import main.java.ie.atu.forge.Similarity.Alignment.SeedAndExtend;
+import main.java.ie.atu.forge.Similarity.Alignment.SmithWaterman;
 import org.junit.jupiter.api.Test;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
 public class AlignmentServiceTest {
 
-    private AlignmentService alignmentService;
+    @Mock
+    private SmithWaterman smithWaterman; // Library Dependency 1
 
-    @BeforeEach
-    void setUp() {
-        // ARRANGE: Initialize the service instance, which also initializes the dependencies
-        alignmentService = new AlignmentService();
-    }
+    @Mock
+    private NeedlemanWunsch needlemanWunsch; // Library Dependency 2
 
-    // --- Tests for SmithWaterman (Local Alignment) ---
+    @InjectMocks
+    private AlignmentService alignmentService; // Service under test
 
-    @Test
-    void smithWaterman_shouldReturnCorrectLocalAlignment() {
-        // ARRANGE
-        // Smith-Waterman finds the best matching local sequences.
-        String s1 = "TIGER";
-        String s2 = "TAGGICR";
-        // Expected result for a standard Smith-Waterman implementation
-        // using common scoring (e.g., Match: 2, Mismatch: -1, Gap: -2)
-        // The best local alignment is typically "TIGER" vs "T-GICR" or similar.
-        // Assuming the utility returns the aligned strings as an array of length 2: [AlignedS1, AlignedS2]
-        String[] expected = {"TIGER", "TA-G-ICR"};
-
-        // ACT
-        String[] result = alignmentService.smithWaterman(s1, s2);
-
-        // ASSERT
-        assertThat(result).isNotNull();
-        assertThat(result.length).isEqualTo(2);
-        // Note: Due to potential differences in scoring schemes,
-        // this is the most likely alignment, but may need adjustment based on the actual Forge library.
-        // For testing, we verify the output format and a plausible alignment.
-        assertThat(result[0]).isNotEmpty();
-        assertThat(result[1]).isNotEmpty();
-    }
+    // --- Tests for SmithWaterman (Instance Delegation) ---
 
     @Test
-    void smithWaterman_shouldHandleEmptyStrings() {
-        // ARRANGE
-        String s1 = "";
-        String s2 = "TEST";
+    void smithWaterman_delegateToLibrary() {
+        // ARRANGE: Use a dummy marker to prove the service is a pipe
+        String[] dummyResult = {"ALIGNED_1", "ALIGNED_2"};
+        when(smithWaterman.align(anyString(), anyString())).thenReturn(dummyResult);
 
         // ACT
-        String[] result = alignmentService.smithWaterman(s1, s2);
+        String[] result = alignmentService.smithWaterman("TIGER", "TAGGICR");
 
-        // ASSERT
-        // Local alignment with an empty string typically returns two empty strings,
-        // or a string of gaps matching the non-empty string.
-        assertThat(result.length).isEqualTo(2);
+        // ASSERT: Prove the connection
+        assertThat(result).isSameAs(dummyResult);
+        verify(smithWaterman, times(1)).align("TIGER", "TAGGICR");
     }
 
-    // --- Tests for NeedlemanWunsch (Global Alignment) ---
+    // --- Tests for NeedlemanWunsch (Instance Delegation) ---
 
     @Test
-    void needlemanWunsch_shouldReturnCorrectGlobalAlignment() {
+    void needlemanWunsch_delegateToLibrary() {
         // ARRANGE
-        // Needleman-Wunsch aligns the full sequences.
-        String s1 = "AGACTAR";
-        String s2 = "TGCAT";
-        // Expected result:
-        // S1: A G A C T A R
-        // S2: - T G C A T -
-        String[] expected = {"AGACTAR", "-TGCAT-"};
+        String[] dummyResult = {"GLOBAL_1", "GLOBAL_2"};
+        when(needlemanWunsch.align(anyString(), anyString())).thenReturn(dummyResult);
 
         // ACT
-        String[] result = alignmentService.needlemanWunsch(s1, s2);
+        String[] result = alignmentService.needlemanWunsch("AGACTAR", "TGCAT");
 
         // ASSERT
-        assertThat(result).isNotNull();
-        assertThat(result.length).isEqualTo(2);
-        // Verify that the aligned strings have the same length
-        assertThat(result[0].length()).isEqualTo(result[1].length());
+        assertThat(result).isSameAs(dummyResult);
+        verify(needlemanWunsch, times(1)).align("AGACTAR", "TGCAT");
     }
 
-    // --- Tests for SeedAndExtend (Heuristic Alignment) ---
-
-    // Note: The structure of Extension[] requires knowledge of the 'Extension' class.
-    // We'll test the structure and a basic plausible alignment result.
+    // --- Tests for SeedAndExtend (Static Delegation) ---
 
     @Test
-    void seedAndExtend_shouldReturnPlausibleExtensions() {
-        // ARRANGE
-        // Seed and Extend uses short k-mers to find potential match regions.
-        String s1 = "SEQUENCEDATA";
-        String s2 = "DATABASES";
-        int kMerLength = 3; // e.g., "DAT" is a common k-mer
+    void seedAndExtend_delegateToLibrary() {
+        // We must use mockStatic because SeedAndExtend.align is a static method
+        try (var mockedStatic = mockStatic(SeedAndExtend.class)) {
+            // ARRANGE: Create a dummy array of Extensions
+            Extension[] dummyExtensions = new Extension[1];
+            // Note: If Extension has a private constructor, just use a null check or mock it
 
-        // ACT
-        Extension[] results = alignmentService.seedAndExtend(s1, s2, kMerLength);
+            mockedStatic.when(() -> SeedAndExtend.align(anyString(), anyString(), anyInt()))
+                    .thenReturn(dummyExtensions);
 
-        // ASSERT
-        assertThat(results).isNotNull();
-        // We expect at least one extension to be found around the common "DATA" substring
-        assertThat(results.length).isGreaterThanOrEqualTo(1);
+            // ACT
+            Extension[] result = alignmentService.seedAndExtend("SEQUENCEDATA", "DATABASES", 3);
 
-        // Further assertion would require knowing the properties of the Extension class:
-        // assertThat(results[0].getScore()).isGreaterThan(0);
-        // assertThat(results[0].getStartS1()).isEqualTo(8); // Start of 'DATA' in s1
-    }
-
-    @Test
-    void seedAndExtend_shouldHandleNoCommonKmers() {
-        // ARRANGE
-        String s1 = "AAAAAA";
-        String s2 = "BBBBBB";
-        int kMerLength = 3;
-
-        // ACT
-        Extension[] results = alignmentService.seedAndExtend(s1, s2, kMerLength);
-
-        // ASSERT
-        // If there are no common k-mers, the array should be empty
-        assertThat(results).isEmpty();
+            // ASSERT
+            assertThat(result).isEqualTo(dummyExtensions);
+            mockedStatic.verify(() -> SeedAndExtend.align("SEQUENCEDATA", "DATABASES", 3));
+        }
     }
 }

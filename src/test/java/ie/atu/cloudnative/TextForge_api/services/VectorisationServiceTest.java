@@ -2,110 +2,88 @@ package ie.atu.cloudnative.TextForge_api.services;
 
 import main.java.ie.atu.forge.Vectorisers.BagOfWords;
 import main.java.ie.atu.forge.Vectorisers.TFIDF;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class VectorisationServiceTest {
 
+    @InjectMocks
     private VectorisationService vectorisationService;
 
-    @BeforeEach
-    void setUp() {
-        // ARRANGE: Initialize the service instance before each test
-        vectorisationService = new VectorisationService();
-    }
-
-    // --- Tests for bow() method ---
+    // --- Bag of Words (BoW) Tests ---
 
     @Test
-    void bow_shouldReturnEmptyBagOfWords_whenInputIsNull() {
-        // ACT
-        BagOfWords result = vectorisationService.bow(null);
+    void bow_shouldCreateAndPopulateBagOfWords() {
+        // ARRANGE: Intercept the "new BagOfWords()" call
+        try (var mockedConstruction = mockConstruction(BagOfWords.class)) {
+            String[] inputWords = {"text", "processing"};
 
-        // ASSERT
-        assertThat(result).isNotNull();
-        // Assuming BagOfWords.size() returns the number of unique words/tokens stored
-        assertThat(result.size()).isEqualTo(0);
-    }
+            // ACT
+            BagOfWords result = vectorisationService.bow(inputWords);
 
-    @Test
-    void bow_shouldReturnEmptyBagOfWords_whenInputIsEmptyArray() {
-        // ARRANGE
-        String[] emptyWords = {};
+            // ASSERT
+            // 1. Verify a BagOfWords was created
+            assertThat(mockedConstruction.constructed()).hasSize(1);
 
-        // ACT
-        BagOfWords result = vectorisationService.bow(emptyWords);
+            // 2. Get the mock that was created inside the service
+            BagOfWords mockBow = mockedConstruction.constructed().get(0);
 
-        // ASSERT
-        assertThat(result).isNotNull();
-        assertThat(result.size()).isEqualTo(0);
+            // 3. Verify the service actually called .add() with our words
+            verify(mockBow).add(inputWords);
+            assertThat(result).isSameAs(mockBow);
+        }
     }
 
     @Test
-    void bow_shouldAddWordsToBagOfWords_whenInputIsValid() {
-        // ARRANGE
-        String[] words = {"text", "processing", "text", "analysis"};
+    void bow_shouldNotCallAdd_whenInputIsEmpty() {
+        try (var mockedConstruction = mockConstruction(BagOfWords.class)) {
+            // ACT
+            vectorisationService.bow(new String[]{});
 
-        // ACT
-        BagOfWords result = vectorisationService.bow(words);
-
-        // ASSERT
-        assertThat(result).isNotNull();
-        // Assuming BagOfWords successfully stores the words
-        // We expect 3 unique words: "text", "processing", "analysis"
-        assertThat(result.size()).isEqualTo(3);
-
-        // Optional: Check specific word count (Requires a public method on BagOfWords, like getCount())
-        // Assuming BagOfWords has a public map or a getCount() method for assertion:
-        // assertThat(result.getCount("text")).isEqualTo(2);
-        // assertThat(result.getCount("analysis")).isEqualTo(1);
+            // ASSERT
+            BagOfWords mockBow = mockedConstruction.constructed().get(0);
+            verify(mockBow, never()).add((String[]) any());
+        }
     }
 
-    // --- Tests for tfidf() method ---
+    // --- TF-IDF Tests ---
 
     @Test
-    void tfidf_shouldReturnTFIDFObject_whenInputIsNull() {
-        // ACT
-        TFIDF result = vectorisationService.tfidf(null);
+    void tfidf_shouldCreateAndPopulateTFIDF() {
+        // ARRANGE: Intercept the "new TFIDF()" call
+        try (var mockedConstruction = mockConstruction(TFIDF.class)) {
+            String[] inputDocs = {"Doc 1", "Doc 2"};
 
-        // ASSERT
-        assertThat(result).isNotNull();
-        // Assuming TFIDF documents list is empty upon creation unless documents are added
-        assertThat(result.getDocumentCount()).isEqualTo(0);
-    }
+            // ACT
+            TFIDF result = vectorisationService.tfidf(inputDocs);
 
-    @Test
-    void tfidf_shouldAddAllDocumentsToTFIDF() {
-        // ARRANGE
-        String[] documents = {
-                "This is document one",
-                "Document two has different words",
-                "The third document is short"
-        };
+            // ASSERT
+            assertThat(mockedConstruction.constructed()).hasSize(1);
 
-        // ACT
-        TFIDF result = vectorisationService.tfidf(documents);
+            TFIDF mockTf = mockedConstruction.constructed().get(0);
 
-        // ASSERT
-        assertThat(result).isNotNull();
-        // Assert that the TFIDF object has correctly processed all 3 documents
-        // Requires a public getter like getDocumentsCount() on the TFIDF class
-        assertThat(result.getDocumentCount()).isEqualTo(3);
+            // Verify the service called addDocuments()
+            verify(mockTf).addDocuments(inputDocs);
+            assertThat(result).isSameAs(mockTf);
+        }
     }
 
     @Test
-    void tfidf_shouldHandleEmptyDocumentsArray() {
-        // ARRANGE
-        String[] documents = {};
+    void tfidf_shouldHandleNullInputGracefully() {
+        try (var mockedConstruction = mockConstruction(TFIDF.class)) {
+            // ACT
+            vectorisationService.tfidf(null);
 
-        // ACT
-        TFIDF result = vectorisationService.tfidf(documents);
-
-        // ASSERT
-        assertThat(result).isNotNull();
-        // Check that no documents were added
-        assertThat(result.getDocumentCount()).isEqualTo(0);
+            // ASSERT
+            TFIDF mockTf = mockedConstruction.constructed().get(0);
+            // Even if null, the service calls tf.addDocuments(null)
+            verify(mockTf).addDocuments(null);
+        }
     }
 }

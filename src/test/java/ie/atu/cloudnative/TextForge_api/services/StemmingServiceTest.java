@@ -1,97 +1,69 @@
 package ie.atu.cloudnative.TextForge_api.services;
 
-import org.junit.jupiter.api.BeforeEach;
+import main.java.ie.atu.forge.Stemmers.Lancaster;
+import main.java.ie.atu.forge.Stemmers.Lovins;
+import main.java.ie.atu.forge.Stemmers.Porter;
 import org.junit.jupiter.api.Test;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mockStatic;
+
+@ExtendWith(MockitoExtension.class)
 public class StemmingServiceTest {
 
+    @InjectMocks
     private StemmingService stemmingService;
 
-    @BeforeEach
-    void setUp() {
-        // ARRANGE: Initialize the service instance
-        stemmingService = new StemmingService();
-    }
-
-    // --- Tests for porter() method ---
-
     @Test
-    void porter_shouldReturnStemmedWords_forValidInput() {
-        // ARRANGE
-        // Example input with words known to be stemmed by the Porter algorithm
-        String text = "running walked cats quickly";
+    void porter_delegateToLibrary() {
+        try (var mockedStatic = mockStatic(Porter.class)) {
+            // ARRANGE
+            String[] dummyOutput = {"run", "walk"};
+            // We must use any(String[].class) because your service passes the whole array
+            mockedStatic.when(() -> Porter.stem(any(String[].class))).thenReturn(dummyOutput);
 
-        // ACT
-        String[] stemmedWords = stemmingService.porter(text);
+            // ACT
+            String[] result = stemmingService.porter("running walking");
 
-        // ASSERT
-        assertThat(stemmedWords).isNotNull();
-        // The core assertion: check that the static method returned the expected stems
-        // We assume Porter.stem() returns: run, walk, cat, quick (common Porter stems)
-        assertThat(stemmedWords).containsExactly("run", "walk", "cat", "quickli");
+            // ASSERT
+            assertThat(result).isSameAs(dummyOutput);
+            mockedStatic.verify(() -> Porter.stem(any(String[].class)));
+        }
     }
 
     @Test
-    void porter_shouldReturnEmptyArray_forEmptyInput() {
-        // ARRANGE
-        String text = "";
+    void lancaster_delegateToLibrary() {
+        try (var mockedStatic = mockStatic(Lancaster.class)) {
+            // ARRANGE
+            String[] dummyOutput = {"org", "man"};
+            mockedStatic.when(() -> Lancaster.stem(any(String[].class))).thenReturn(dummyOutput);
 
-        // ACT
-        String[] stemmedWords = stemmingService.porter(text);
+            // ACT
+            String[] result = stemmingService.lancaster("organization management");
 
-        // ASSERT
-        // An empty string split by " " usually results in an array containing an empty string
-        // The underlying utility should ideally handle this and return an empty array.
-        // If Porter.stem("") returns [""] (a single element), adjust the assertion.
-        assertThat(stemmedWords).containsExactly("");
+            // ASSERT
+            assertThat(result).isSameAs(dummyOutput);
+            mockedStatic.verify(() -> Lancaster.stem(any(String[].class)));
+        }
     }
 
-    // --- Tests for lancaster() method ---
-
     @Test
-    void lancaster_shouldReturnStemmedWords_forValidInput() {
-        // ARRANGE
-        String text = "organization management computing";
+    void lovins_delegateToLibrary() {
+        try (var mockedStatic = mockStatic(Lovins.class)) {
+            // ARRANGE
+            String[] dummyOutput = {"rel", "inform"};
+            mockedStatic.when(() -> Lovins.stem(any(String[].class))).thenReturn(dummyOutput);
 
-        // ACT
-        String[] stemmedWords = stemmingService.lancaster(text);
+            // ACT
+            String[] result = stemmingService.lovins("relational information");
 
-        // ASSERT
-        assertThat(stemmedWords).isNotNull();
-        // Assuming Lancaster.stem() returns the expected stems (e.g., organ, manage, comput)
-        assertThat(stemmedWords).containsExactly("org", "man", "comput");
-    }
-
-    // --- Tests for lovins() method ---
-
-    @Test
-    void lovins_shouldReturnStemmedWords_forValidInput() {
-        // ARRANGE
-        String text = "relational information retrieval";
-
-        // ACT
-        String[] stemmedWords = stemmingService.lovins(text);
-
-        // ASSERT
-        assertThat(stemmedWords).isNotNull();
-        // Assuming Lovins.stem() returns the expected stems
-        assertThat(stemmedWords).containsExactly("rel", "inform", "retrief");
-    }
-
-    // --- General Edge Case Test (Applies to all) ---
-
-    @Test
-    void porter_shouldHandleMultipleSpacesCorrectly() {
-        // ARRANGE
-        String text = "  word   test  "; // Multiple spaces should result in empty strings in the split array
-
-        // ACT
-        String[] stemmedWords = stemmingService.porter(text);
-
-        // ASSERT
-        // The underlying stemming utility must be robust enough to ignore or handle empty strings created by multiple spaces.
-        // We expect only the stems for "word" and "test" to remain.
-        assertThat(stemmedWords).containsExactly("", "", "word", "", "", "test");
+            // ASSERT
+            assertThat(result).isSameAs(dummyOutput);
+            mockedStatic.verify(() -> Lovins.stem(any(String[].class)));
+        }
     }
 }

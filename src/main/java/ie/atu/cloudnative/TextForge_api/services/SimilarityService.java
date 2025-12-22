@@ -11,8 +11,8 @@ import java.util.Set;
 public class SimilarityService {
     private final MinHash minHash;
 
-    public SimilarityService() {
-        this.minHash = new MinHash(128);
+    public SimilarityService(MinHash mh) {
+        this.minHash = mh;
     }
 
     public Double cosine(int[] v1, int[] v2) {
