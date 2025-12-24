@@ -35,7 +35,6 @@ publishing {
 	publications {
 		mavenJava(MavenPublication) {
 			from components.java
-
 			groupId = 'com.github.cianmacg'
 			artifactId = 'textforge-api'
 			version = '1.0.1-SNAPSHOT'
@@ -46,8 +45,10 @@ publishing {
 			name = "GitHubPackages"
 			url = uri("https://maven.pkg.github.com/cianmacg/TextForge-api")
 			credentials {
-				username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-				password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+				// 1. Try local gradle.properties
+				// 2. Fallback to GitHub Action Env Vars
+				username = project.findProperty("gpr.user") ?: System.getenv("GPR_USER")
+				password = project.findProperty("gpr.key") ?: System.getenv("GPR_TOKEN")
 			}
 		}
 	}
