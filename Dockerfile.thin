@@ -1,0 +1,12 @@
+FROM container-registry.oracle.com/java/openjdk:24
+WORKDIR /app
+
+# 1. Copy the JAR
+COPY build/libs/*.jar app.jar
+
+# 2. Copy the missing resource specifically
+# (Creating the directory structure first)
+COPY src/main/resources/bpe_vocab_hex.json src/main/resources/bpe_vocab_hex.json
+
+EXPOSE 8080
+ENTRYPOINT ["java", "--enable-preview", "-jar", "app.jar"]
