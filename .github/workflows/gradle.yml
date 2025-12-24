@@ -40,6 +40,12 @@ jobs:
         GPR_USER: ${{ github.actor }}
         GPR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Publish to GitHub Packages
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      run: ./gradlew publish
+      env:
+        GPR_USER: ${{ github.actor }}
+
   #   # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
   #   # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
   #   #
