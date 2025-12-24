@@ -24,8 +24,8 @@ repositories {
         credentials {
             // IMPORTANT: Credentials are required to download from GitHub Packages
             // Use environment variables or local properties for security.
-            username = project.findProperty("gthbUsername") ?: ''
-            password = project.findProperty("gthbPAT") ?: ''
+			username = System.getenv("GPR_USER") ?: project.findProperty("gthbUsername")
+			password = System.getenv("GPR_TOKEN") ?: project.findProperty("gthbPat")
         }
     }
 }
