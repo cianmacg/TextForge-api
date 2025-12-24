@@ -46,8 +46,8 @@ publishing {
 			name = "GitHubPackages"
 			url = uri("https://maven.pkg.github.com/cianmacg/TextForge-api")
 			credentials {
-				username = System.getenv("GPR_USER") ?: project.findProperty("gthbUsername")
-				password = System.getenv("GPR_TOKEN") ?: project.findProperty("gthbPat")
+				username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+				password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
 			}
 		}
 	}
