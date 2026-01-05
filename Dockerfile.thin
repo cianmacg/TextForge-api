@@ -8,5 +8,5 @@ COPY build/libs/*.jar app.jar
 # (Creating the directory structure first)
 COPY src/main/resources/bpe_vocab_hex.json src/main/resources/bpe_vocab_hex.json
 
-EXPOSE 8080
+EXPOSE 8081
 ENTRYPOINT ["java", "--enable-preview", "-jar", "app.jar"]
