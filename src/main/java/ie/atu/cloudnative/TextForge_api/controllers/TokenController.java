@@ -37,7 +37,9 @@ public class TokenController {
 
     @GetMapping("/shingle")
     public String[] shingles(@Valid @RequestBody TokenRequest request) {
-        return tokenisationService.shingles(request.text(), request.window());
+        int window = request.window() != null && request.window() != 0 ? request.window() : 3;
+
+        return tokenisationService.shingles(request.text(), window);
     }
 
     @GetMapping("/encode")
