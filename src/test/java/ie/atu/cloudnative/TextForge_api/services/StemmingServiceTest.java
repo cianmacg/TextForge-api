@@ -47,7 +47,7 @@ public class StemmingServiceTest {
 
             // ASSERT
             assertThat(result).isSameAs(dummyOutput);
-            mockedStatic.verify(() -> Lancaster.stem(any(String[].class)));
+            mockedStatic.verify(() -> Lancaster.stem(any(String.class)));
         }
     }
 
